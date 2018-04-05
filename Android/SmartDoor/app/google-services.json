@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "227466945734",
+    "firebase_url": "https://smartdoor-ef9f2.firebaseio.com",
+    "project_id": "smartdoor-ef9f2",
+    "storage_bucket": "smartdoor-ef9f2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:227466945734:android:44dca8477fdf475c",
+        "android_client_info": {
+          "package_name": "com.example.donghyeon.smartdoor"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "227466945734-vbocn0iicirsri4cfu3k5fv6enqc6ke5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCItWNs93lCJ27G-jXUzMPg4PunCNESv1k"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
