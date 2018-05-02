@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "370256432441",
+    "firebase_url": "https://smartdoorsystem-c3ce0.firebaseio.com",
+    "project_id": "smartdoorsystem-c3ce0",
+    "storage_bucket": "smartdoorsystem-c3ce0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:370256432441:android:c49dbbd4d0357934",
+        "android_client_info": {
+          "package_name": "com.example.donghyeon.smartdoorsystem"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "370256432441-l7cgh4e8lovpg0g44t180di0t0o74afj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBRmAyZdjftE6pANJ8bZ2e2iPyeg4JXlDI"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
