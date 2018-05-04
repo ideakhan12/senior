@@ -23,24 +23,29 @@ import java.net.URL;
 
 public class FirebaseMessagingService extends com.google.firebase.messaging.FirebaseMessagingService {
     private static final String TAG = "FirebaseMsgService";
-    public String title, contents;
+    public String title, body;
 
     // [START receive_message]
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
+
         PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE );
         PowerManager.WakeLock wakeLock = pm.newWakeLock( PowerManager.SCREEN_DIM_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, "TAG" );
         wakeLock.acquire(3000);
 
-        if (remoteMessage.getData().size() > 0) {
+        title = remoteMessage.getData().get("title");
+        body = remoteMessage.getData().get("body");
+        sendNotification(title, body);
+
+        /*if (remoteMessage.getData().size() > 0) {
             sendNotification(remoteMessage.getData().get("message"));
         }
         if (remoteMessage.getNotification() != null) {
             sendNotification(remoteMessage.getNotification().getBody());
-        }
+        }*/
     }
 
-    private void sendNotification(String messageBody) {
+    private void sendNotification(String title, String body) {
 
         Intent intent = new Intent(this, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -50,10 +55,11 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
         Uri defaultSoundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentTitle("Watch Your Door")
-                .setContentText("SMART DOOR SYSTEM")
+                .setContentTitle(title)
+                .setContentText(body)
                 .setAutoCancel(true)
                 .setSound(defaultSoundUri)
+                .setVibrate(new long[]{1000, 1000})
                 .setContentIntent(pendingIntent);
 
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
