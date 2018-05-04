@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        FirebaseMessaging.getInstance().subscribeToTopic("news");
+        FirebaseMessaging.getInstance().subscribeToTopic("bell");
         FirebaseInstanceId.getInstance().getToken();
 
         //에러메시지 내보낼 텍스트뷰
@@ -117,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         });
-        mWebView.loadUrl("http://m.naver.com");
+        mWebView.loadUrl("http://13.125.176.185");
     }
 
 
