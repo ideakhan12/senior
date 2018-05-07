@@ -37,6 +37,15 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
         body = remoteMessage.getData().get("body");
         sendNotification(title, body);
 
+<<<<<<< HEAD
+=======
+        /*if (remoteMessage.getData().size() > 0) {
+            sendNotification(remoteMessage.getData().get("message"));
+        }
+        if (remoteMessage.getNotification() != null) {
+            sendNotification(remoteMessage.getNotification().getBody());
+        }*/
+>>>>>>> KDH
     }
 
     private void sendNotification(String title, String body) {

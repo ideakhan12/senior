@@ -117,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         });
-        mWebView.loadUrl("http://m.naver.com");
+        mWebView.loadUrl("http://13.125.176.185");
     }
 
 
