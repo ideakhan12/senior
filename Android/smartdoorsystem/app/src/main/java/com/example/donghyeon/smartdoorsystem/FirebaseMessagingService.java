@@ -23,23 +23,23 @@ import java.net.URL;
 
 public class FirebaseMessagingService extends com.google.firebase.messaging.FirebaseMessagingService {
     private static final String TAG = "FirebaseMsgService";
-    public String title, contents;
+    public String title, body;
 
     // [START receive_message]
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
-        sendNotification(remoteMessage.getData().get("message"));
+
+        PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE );
+        PowerManager.WakeLock wakeLock = pm.newWakeLock( PowerManager.SCREEN_DIM_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, "TAG" );
+        wakeLock.acquire(3000);
+
+        title = remoteMessage.getData().get("title");
+        body = remoteMessage.getData().get("body");
+        sendNotification(title, body);
+
     }
 
-    private void sendNotification(String messageBody) {
-
-        try {
-            JSONObject jsonRootObject = new JSONObject(messageBody);
-            title = jsonRootObject.getString("title");
-            contents = jsonRootObject.getString("contents");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+    private void sendNotification(String title, String body) {
 
         Intent intent = new Intent(this, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -50,9 +50,10 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setContentTitle(title)
-                .setContentText(contents)
+                .setContentText(body)
                 .setAutoCancel(true)
                 .setSound(defaultSoundUri)
+                .setVibrate(new long[]{1000, 1000})
                 .setContentIntent(pendingIntent);
 
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -60,4 +61,3 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
         notificationManager.notify(0, notificationBuilder.build());
     }
 }
-
