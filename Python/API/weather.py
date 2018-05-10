@@ -3,7 +3,6 @@ import pytz
 import urllib.request
 import json
 
-
 def get_api_date():
     standard_time = [2, 5, 8, 11, 14, 17, 20, 23]
     time_now = datetime.datetime.now(tz=pytz.timezone('Asia/Seoul')).strftime('%H')
@@ -18,17 +17,16 @@ def get_api_date():
     date_now = datetime.datetime.now(tz=pytz.timezone('Asia/Seoul')).strftime('%Y%m%d')
     check_date = int(date_now) - day_calibrate
 
-    print(str(check_date))
-    print(str(check_time))
     return (str(check_date), (str(check_time) + '00'))
 
 
 def get_weather_data():
     api_date, api_time = get_api_date()
+    print(api_time)
     url = "http://newsky2.kma.go.kr/service/SecndSrtpdFrcstInfoService2/ForecastSpaceData?"
     key = "serviceKey=xiwyodx6q6TGfsaTJuKAy%2Fr96A7r1A6KIlGCeXxXRV3V%2B1J1RPWNPo22N4udyQr%2BuBlhJYWh9e%2FANYiTbtzcSw%3D%3D"
     date = "&base_date=" + api_date
-    time = "&base_time=" + api_time
+    time = "&base_time=" + "1700"
     nx = "&nx=56"
     ny = "&ny=122"
     numOfRows = "&numOfRows=100"
@@ -40,22 +38,31 @@ def get_weather_data():
 
     parsed_json = data_json['response']['body']['items']['item']
 
+    print(parsed_json)
+
+    target_time = []
     target_date = parsed_json[0]['fcstDate']  # get date and time
     target_time = parsed_json[0]['fcstTime']
 
+    print(target_time)
+
     date_calibrate = target_date  # date of TMX, TMN
+
+    '''
     if target_time > 1300 :
         date_calibrate = str(int(target_date) + 1)
+    '''
 
     passing_data = {}
     for one_parsed in parsed_json:
         if one_parsed['fcstDate'] == target_date and one_parsed['fcstTime'] == target_time:  # get today's data
             passing_data[one_parsed['category']] = one_parsed['fcstValue']
 
+
         if one_parsed['fcstDate'] == date_calibrate and (
                 one_parsed['category'] == 'TMX' or one_parsed['category'] == 'TMN'):  # TMX, TMN at calibrated day
             passing_data[one_parsed['category']] = one_parsed['fcstValue']
-
+        
     print(passing_data)
     return passing_data
 
