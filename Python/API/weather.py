@@ -3,7 +3,10 @@ import pytz
 import urllib.request
 import json
 
-rainfall_arr=[]
+pop_dic = {} # 강우확률을 저장해둘 리스트
+pty_dic = {} # 강우 종류를 저장해둘 리스트
+time_arr = []
+time_arr2 = []
 
 def get_api_date():
     standard_time = [2, 5, 8, 11, 14, 17, 20, 23]
@@ -39,43 +42,34 @@ def get_weather_data():
 
     parsed_json = data_json['response']['body']['items']['item']
 
-    #target_date = parsed_json[0]['fcstDate']  # get date and time
-    #target_time = parsed_json[0]['fcstTime']
+    target_date = parsed_json[0]['fcstDate']  # get date and time
+    target_time = parsed_json[0]['fcstTime']
 
-    for one_parsed in parsed_json :
-        if one_parsed['category'] == "POP" :
-            rainfall_arr.append(one_parsed['fcstValue'])
-        if one_parsed['category'] == "TMX" :
-            TMX = one_parsed['fcstValue']
-
-    MRP = max(rainfall_arr)
-    if MRP > 50 :
-        print("금일 최고 강수 확률은 %d 퍼센트로 흐리거나 비가 올 확률이 높습니다."% MRP)
-    else :
-        print("금일 최고 강수 확률은 %d 퍼센트로 맑은 날씨가 예상됩니다." % MRP)
-
-    print("금일 낮 최고온도는 섭씨 %d도 입니다."%TMX)
-
-    '''
     date_calibrate = target_date  # date of TMX, TMN
 
-    if target_time > 1500 :
+    if int(target_time) > 1300 :
         date_calibrate = str(int(target_date) + 1)
 
-    
-    passing_data = {}
     for one_parsed in parsed_json:
+        if one_parsed['category'] == "POP":
+            if one_parsed['fcstTime'] not in time_arr :
+                pop_dic[one_parsed['fcstTime']] = one_parsed['fcstValue']
+                time_arr.append(one_parsed['fcstTime'])
+        if one_parsed['category'] == "PTY":
+            if one_parsed['fcstTime'] not in time_arr2 :
+                pty_dic[one_parsed['fcstTime']] = one_parsed['fcstValue']
+                time_arr2.append(one_parsed['fcstTime'])
         if one_parsed['fcstDate'] == target_date and one_parsed['fcstTime'] == target_time:  # get today's data
-            passing_data[one_parsed['category']] = one_parsed['fcstValue']
+            if one_parsed['category'] == "SKY":
+                sky = one_parsed['fcstValue']
+                print(sky)
+        if one_parsed['fcstDate'] == date_calibrate and (one_parsed['category'] == 'TMX'):  # TMX, TMN at calibrated day
+            TMX = one_parsed['fcstValue']
+            print(TMX)
 
+    print(pop_dic)
+    print(pty_dic)
 
-        if one_parsed['fcstDate'] == date_calibrate and (
-                one_parsed['category'] == 'TMX' or one_parsed['category'] == 'TMN'):  # TMX, TMN at calibrated day
-            passing_data[one_parsed['category']] = one_parsed['fcstValue']
-        
-    print(passing_data)
-    return passing_data
-    '''
     return 0
 
 
