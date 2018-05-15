@@ -21,9 +21,8 @@ door_pin  = 21
 pir_pin = 26
 
 GPIO.setmode(GPIO.BCM)
-GPIO.setmode(GPIO.BCM)
 GPIO.setup(pir_pin, GPIO.IN)
-GPIO.setup(door_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(door_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 count=0
 
 #타이머 함수 사용 count 초기화 할것
@@ -36,7 +35,7 @@ count=0
 
 def DoorSensor():
     while True:
-        if GPIO.output(door_pin) == True:
+        if GPIO.input(door_pin) == True:
             print("DOOR OPEN")
         else:
             break
@@ -62,6 +61,27 @@ time.sleep(.5)
 print("Ready")
 
 try:
+    GPIO.add_event_detect(door_pin, GPIO.RISING)
+    GPIO.add_event_detect(pir_pin, GPIO.RISING)
+    GPIO.add_event_callback(채널, my_callback_one)
+    GPIO.add_event_callback(채널, my_callback_two)
+
+
+
+
+
+    while True:
+        if io.input(pir_pin):
+            print("PIR ALARM!")
+        if io.input(door_pin):
+            print("DOOR ALARM!")
+        time.sleep(0.5)
+
+
+
+
+
+
     if GPIO.intput(door_pin):
         GPIO.remove_event_detect(pir_pin)
         count = 0
