@@ -94,11 +94,11 @@ def tts_weather() :
 
     for all in all_time :
         if pty_dic[all] == 1 :
-            pty_dic[all] = "비"
+            pty_dic[all] = "비가"
         elif pty_dic[all] == 2 :
-            pty_dic[all] = "진눈깨비"
+            pty_dic[all] = "진눈깨비가"
         elif pty_dic[all] == 3 :
-            pty_dic[all] = "눈"
+            pty_dic[all] = "눈이"
 
     # GET : 기상상태가 바뀌는 시간
     for i in range(len(all_time)) :
@@ -111,7 +111,7 @@ def tts_weather() :
     for time in change_time :
         if flag == 1 :
             if pty_dic[time] != 0:
-                msg = "현재 "+str(pty_dic[time])+"가 내리고 있습니다"
+                msg = "현재 "+str(pty_dic[time])+" 내리고 있습니다"
             else :
                 msg = "현재 " +str(sky_dic[time])+ " 입니다"
             flag += 1
