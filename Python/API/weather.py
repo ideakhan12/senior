@@ -117,9 +117,9 @@ def tts_weather() :
             flag += 1
         else :
             if pty_dic[time] != 0:
-                msg += " 이후 "+str(time[0:2])+"시에 "+str(pty_dic[time])+"가 내릴 예정입니다"
+                msg += " 이후 "+str(time[0:2])+"시에 "+str(pty_dic[time])+" 예상됩니다"
             else :
-                msg += " 이후 "+str(time[0:2])+"시에 그칠 예정이며 "+str(sky_dic[time]) + " 예정입니다"
+                msg += " 이후 "+str(time[0:2])+"시에 그칠 예정이며 "+str(sky_dic[time]) + " 예상됩니다"
 
     if TMX > 33 :
         msg+=" 금일 낮 최고 온도는 "+str(TMX)+"도로 예상되며 폭염에 주의하세요"
