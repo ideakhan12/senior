@@ -77,7 +77,6 @@ except KeyboardInterrupt:
     print("Quit")
     GPIO.cleanup()
 
-
 #except (GPIO.input(door_pin) != True):
 #    DoorSensor()
 
