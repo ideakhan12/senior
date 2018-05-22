@@ -3,12 +3,13 @@ import time
 import json
 import requests
 import timeit
+import os
 import datetime
 import pytz
 import urllib.request
 import pygame
 from gtts import gTTS
-
+from datetime import datetime
 
 headers = {
     'Authorization': 'key= AAAAVjUAzTk:APA91bFpZLbUpXYTCV-wOXYZyG9RIKnhkZlVu1zOHnsFglpDSyQm-tEEZSAylVDcPzin4_nz3LXFUbJlLDH9Fhkk2ZPPdvqvgiJfyxDW_J2cY8uYQlsXfDZZjuJpUEEfNR1Yr9bPCkEI',
@@ -38,32 +39,26 @@ count=0
 #    end = timeit.default_timer()
 #    timer = end - start
 
+def demend():
+    params = {'id': 'test'}
+    res = requests.post('http://52.79.133.253/demand.php', data=params)
+    text = res.text.encode('utf8')[3:].decode('utf8')
 
-def DoorSensor():
-    while True:
-        if GPIO.input(door_pin) == True:
-            tts_weather()
-            print("DOOR OPEN")
-        else:
-            break
-        time.sleep(5)
+    now = datetime.strptime(datetime.now().strftime("%Y-%m-%d %H:%M:%S"), '%Y-%m-%d %H:%M:%S')
 
+    data = json.loads(text)
+    text = ""
 
-def MotionSensor():
-    global count
+    for d in data:
+        s_date = datetime.strptime(d['s_date'], '%Y-%m-%d %H:%M:%S')
+        e_date = datetime.strptime(d['e_date'], '%Y-%m-%d %H:%M:%S')
 
-    try:
-        if count >= 4 :
-            print ("Motion Detected!")
-            response = requests.post('https://fcm.googleapis.com/fcm/send', headers=headers, data=json.dumps(data))
-            print (response)
-            count = 0
-        else:
-            count += 1
-            print ("count = %d" % count)
-            time.sleep(2)
-    except GPIO.add_event_detect(door_pin, GPIO.RISING):
-        GPIO.add_event_callback(door, DoorSensor)
+        if (now > s_date) and (now < e_date):
+            text = text + d['text'] + " ″"
+
+    tts = gTTS(text=text, lang='ko')
+    tts.save("input_test2.mp3")
+    os.system("input_test2.mp3")
 
 
 # GET : API를 호출할 시간과 날짜
@@ -194,6 +189,36 @@ def tts_weather() :
     pygame.mixer.init()
     pygame.mixer.music.load("demand+weather.mp3")
     pygame.mixer.music.play()
+
+
+def DoorSensor():
+    while True:
+        if GPIO.input(door_pin) == True:
+            tts_weather()
+            demend()
+        else:
+            break
+        time.sleep(5)
+
+
+def MotionSensor():
+    global count
+
+    try:
+        if count >= 4 :
+            print ("Motion Detected!")
+            response = requests.post('https://fcm.googleapis.com/fcm/send', headers=headers, data=json.dumps(data))
+            print (response)
+            count = 0
+        else:
+            count += 1
+            print ("count = %d" % count)
+            time.sleep(2)
+    except GPIO.add_event_detect(door_pin, GPIO.RISING):
+        GPIO.add_event_callback(door, DoorSensor)
+
+
+
 
 if __name__ == '__main__':
     print("Smart Door System")
