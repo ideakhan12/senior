@@ -8,22 +8,18 @@ params = {'id':'test'}
 res = requests.post('http://52.79.133.253/demand.php', data=params)
 text = res.text.encode('utf8')[3:].decode('utf8')
 
+now = datetime.strptime(datetime.now().strftime("%Y-%m-%d %H:%M:%S"), '%Y-%m-%d %H:%M:%S')
+
 data = json.loads(text)
-val = data[0]['text']
+text = ""
 
-#시작시간 저장
-sdate = data[0]['s_date']
-s_date = datetime.datetime.strptime(sdate, '%Y-%m-%d %H:%M:%S')
+for d in data:
+    s_date = datetime.strptime(d['s_date'], '%Y-%m-%d %H:%M:%S')
+    e_date = datetime.strptime(d['e_date'], '%Y-%m-%d %H:%M:%S')
 
-#종료시간 저장
-edate = data[0]['e_date']
-e_date = datetime.datetime.strptime(edate, '%Y-%m-%d %H:%M:%S')
+    if (now > s_date) and (now < e_date):
+        text = text + d['text'] + " ″"
 
-# 시스템시간 저장
-systime = datetime.datetime.now()
-
-#시간비교 후 출력
-if systime.time() > s_date.time() & systime.time() < e_date.time():
-    tts = gTTS(text=val, lang='en')
-    tts.save("input_test2.mp3")
-    os.system("C:/Users/YUNKYUNG/PycharmProjects/untitled/input_test2.mp3")
+tts = gTTS(text=text, lang='ko')
+tts.save("input_test2.mp3")
+os.system("input_test2.mp3")
