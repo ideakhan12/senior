@@ -1,16 +1,73 @@
+import RPi.GPIO as GPIO
+import time
+import json
+import requests
+import timeit
+import os
 import datetime
 import pytz
 import urllib.request
-import requests
-import json
 import pygame
 from gtts import gTTS
+from datetime import datetime
+
+headers = {
+    'Authorization': 'key= AAAAVjUAzTk:APA91bFpZLbUpXYTCV-wOXYZyG9RIKnhkZlVu1zOHnsFglpDSyQm-tEEZSAylVDcPzin4_nz3LXFUbJlLDH9Fhkk2ZPPdvqvgiJfyxDW_J2cY8uYQlsXfDZZjuJpUEEfNR1Yr9bPCkEI',
+    'Content-Type': 'application/json',
+}
+
+data = {
+    'to': '/topics/bell',
+    'data': {
+        'title': '외부인 접근 알림',
+        'body': 'SMART DOOR SYSTEM',
+    }
+}
+
+door_pin  = 21
+pir_pin = 26
+
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(pir_pin, GPIO.IN)
+GPIO.setup(door_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+count=0
+
+#타이머 함수 사용 count 초기화 할것
+#def timer(f):
+#    start = timeit.default_timer()
+#    함수
+#    end = timeit.default_timer()
+#    timer = end - start
+
+def demand():
+    params = {'id': 'test'}
+    res = requests.post('http://52.79.133.253/demand.php', data=params)
+    text = res.text.encode('utf8')[3:].decode('utf8')
+
+    now = datetime.strptime(datetime.now().strftime("%Y-%m-%d %H:%M:%S"), '%Y-%m-%d %H:%M:%S')
+
+    data = json.loads(text)
+    text = ""
+
+    for d in data:
+        s_date = datetime.strptime(d['s_date'], '%Y-%m-%d %H:%M:%S')
+        e_date = datetime.strptime(d['e_date'], '%Y-%m-%d %H:%M:%S')
+
+        if (now > s_date) and (now < e_date):
+            text = text + d['text'] + " ″"
+
+    tts = gTTS(text=text, lang='ko')
+    tts.save("input_test2.mp3")
+
+    pygame.mixer.init()
+    pygame.mixer.music.load("input_test2.mp3")
+    pygame.mixer.music.play()
 
 # GET : API를 호출할 시간과 날짜
 def get_api_date():
     # API 호출 가능 시간은 standard_time에 시간만 가능
     standard_time = [2, 5, 8, 11, 14, 17, 20, 23]
-    time_now = datetime.datetime.now(tz=pytz.timezone('Asia/Seoul')).strftime('%H')
+    time_now = datetime.now(tz=pytz.timezone('Asia/Seoul')).strftime('%H')
     check_time = int(time_now) - 1
     day_calibrate = 0
     # GET : standard_time 중 현재시간과 가장 가까운 시간
@@ -20,7 +77,7 @@ def get_api_date():
             day_calibrate = 1
             check_time = 23
 
-    date_now = datetime.datetime.now(tz=pytz.timezone('Asia/Seoul')).strftime('%Y%m%d')
+    date_now =datetime.now(tz=pytz.timezone('Asia/Seoul')).strftime('%Y%m%d')
     check_date = int(date_now) - day_calibrate
 
     return (str(check_date), (str(check_time) + '00'))
@@ -77,7 +134,7 @@ def tts_weather() :
     pty_dic, sky_dic, TMX, target_time, all_time = get_weather_data()
     change_time = [target_time] # 기상상태 바뀌는 시간을 저장할 배열
     TMX = int(TMX)
-    
+
     # 코드명으로 된 Value값 한글로 변환
     for all in all_time :
         if sky_dic[all] == 1 :
@@ -91,11 +148,11 @@ def tts_weather() :
 
     for all in all_time :
         if pty_dic[all] == 1 :
-            pty_dic[all] = "비"
+            pty_dic[all] = "비가"
         elif pty_dic[all] == 2 :
-            pty_dic[all] = "진눈깨비"
+            pty_dic[all] = "진눈깨비가"
         elif pty_dic[all] == 3 :
-            pty_dic[all] = "눈"
+            pty_dic[all] = "눈이"
 
     # GET : 기상상태가 바뀌는 시간
     for i in range(len(all_time)) :
@@ -108,15 +165,15 @@ def tts_weather() :
     for time in change_time :
         if flag == 1 :
             if pty_dic[time] != 0:
-                msg = "현재 "+str(pty_dic[time])+"가 내리고 있습니다"
+                msg = "현재 "+str(pty_dic[time])+" 내리고 있습니다"
             else :
                 msg = "현재 " +str(sky_dic[time])+ " 입니다"
             flag += 1
         else :
             if pty_dic[time] != 0:
-                msg += " 이후 "+str(time[0:2])+"시에 "+str(pty_dic[time])+"가 내릴 예정입니다"
+                msg += " 이후 "+str(time[0:2])+"시에 "+str(pty_dic[time])+" 예상됩니다"
             else :
-                msg += " 이후 "+str(time[0:2])+"시에 그칠 예정이며 "+str(sky_dic[time]) + " 예정입니다"
+                msg += " 이후 "+str(time[0:2])+"시에 그칠 예정이며 "+str(sky_dic[time]) + " 예상됩니다"
 
     if TMX > 33 :
         msg+=" 금일 낮 최고 온도는 "+str(TMX)+"도로 예상되며 폭염에 주의하세요"
@@ -134,6 +191,59 @@ def tts_weather() :
     pygame.mixer.init()
     pygame.mixer.music.load("demand+weather.mp3")
     pygame.mixer.music.play()
+    
+
+
+def DoorSensor():
+    while True:
+        if GPIO.input(door_pin) == True:
+            tts_weather()
+            time.sleep(8)
+            demand()
+        else:
+            break
+        time.sleep(5)
+
+
+def MotionSensor():
+    global count
+
+    try:
+        if count >= 3 :
+            print ("Motion Detected!")
+            response = requests.post('https://fcm.googleapis.com/fcm/send', headers=headers, data=json.dumps(data))
+            print (response)
+            count = 0
+        else:
+            count += 1
+            print ("count = %d" % count)
+            time.sleep(2)
+    except GPIO.add_event_detect(door_pin, GPIO.RISING):
+        GPIO.add_event_callback(door, DoorSensor)
+
+
+
 
 if __name__ == '__main__':
-    tts_weather()
+    print("Smart Door System")
+    time.sleep(.5)
+    print("Ready")
+
+    try:
+        while True:
+            if GPIO.input(door_pin):
+                count = 0
+                DoorSensor()
+            if GPIO.input(pir_pin):
+                MotionSensor()
+        #GPIO.add_event_detect(pir_pin, GPIO.RISING, callback=MotionSensor)
+            time.sleep(1)
+
+    except KeyboardInterrupt:
+        print("Quit")
+        GPIO.cleanup()
+
+#except (GPIO.input(door_pin) != True):
+#    DoorSensor()
+
+#GPIO. 함수들 찾아볼 것
