@@ -33,8 +33,7 @@ GPIO.setup(door_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 count=0
 timer_count=0
 
-
-def demend():
+def demand():
     params = {'id': 'test'}
     res = requests.post('http://52.79.133.253/demand.php', data=params)
     text = res.text.encode('utf8')[3:].decode('utf8')
@@ -53,14 +52,17 @@ def demend():
 
     tts = gTTS(text=text, lang='ko')
     tts.save("input_test2.mp3")
-    os.system("input_test2.mp3")
+
+    pygame.mixer.init()
+    pygame.mixer.music.load("input_test2.mp3")
+    pygame.mixer.music.play()
 
 
 # GET : API를 호출할 시간과 날짜
 def get_api_date():
     # API 호출 가능 시간은 standard_time에 시간만 가능
     standard_time = [2, 5, 8, 11, 14, 17, 20, 23]
-    time_now = datetime.datetime.now(tz=pytz.timezone('Asia/Seoul')).strftime('%H')
+    time_now = datetime.now(tz=pytz.timezone('Asia/Seoul')).strftime('%H')
     check_time = int(time_now) - 1
     day_calibrate = 0
     # GET : standard_time 중 현재시간과 가장 가까운 시간
@@ -70,7 +72,7 @@ def get_api_date():
             day_calibrate = 1
             check_time = 23
 
-    date_now = datetime.datetime.now(tz=pytz.timezone('Asia/Seoul')).strftime('%Y%m%d')
+    date_now =datetime.now(tz=pytz.timezone('Asia/Seoul')).strftime('%Y%m%d')
     check_date = int(date_now) - day_calibrate
 
     return (str(check_date), (str(check_time) + '00'))
@@ -191,7 +193,8 @@ def DoorSensor():
         #문열림 감지시 날씨 알림과 요구사항 데이터 음성 출력
         if GPIO.input(door_pin) == True:
             tts_weather()
-            demend()
+            time.sleep(8)
+            demand()
         else:
             break
         time.sleep(5)
@@ -199,21 +202,23 @@ def DoorSensor():
 #PIR 모션 센서 작동
 def MotionSensor():
     global count
+    global timer_count
     try:
-        #2초 간격으로 모션센서 작동 count증가, count가 3이상일 경우 푸시 알람
+        # 2초 간격으로 모션센서 작동 count증가, count가 3이상일 경우 푸시 알람
         if count >= 3 :
             print ("Motion Detected!")
             response = requests.post('https://fcm.googleapis.com/fcm/send', headers=headers, data=json.dumps(data))
             print (response)
             count = 0
+            timer_count = 0
         else:
             count += 1
             print ("count = %d" % count)
-            time.sleep(1)
-    #모션 감지 도중 문열림 감지시 스위치 도어 센서 함수 호출
+            timer_count = 0
+            time.sleep(2)
+    # 모션 감지 도중 문열림 감지시 스위치 도어 센서 함수 호출
     except GPIO.add_event_detect(door_pin, GPIO.RISING):
         GPIO.add_event_callback(door, DoorSensor)
-
 
 #메인 함수
 if __name__ == '__main__':
@@ -225,14 +230,14 @@ if __name__ == '__main__':
         while True:
             if timer_count == 15:
                 count = 0
+                timer_count=0
             if GPIO.input(door_pin):
                 count = 0
                 DoorSensor()
             if GPIO.input(pir_pin):
-                    MotionSensor()
+                MotionSensor()
             time.sleep(1)
             timer_count += 1
-
     #종료 예외처리
     except KeyboardInterrupt:
         print("Quit")
