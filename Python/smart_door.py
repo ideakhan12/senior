@@ -31,13 +31,7 @@ GPIO.setmode(GPIO.BCM)
 GPIO.setup(pir_pin, GPIO.IN)
 GPIO.setup(door_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 count=0
-
-#타이머 함수 사용 count 초기화 할것
-#def timer(f):
-#    start = timeit.default_timer()
-#    함수
-#    end = timeit.default_timer()
-#    timer = end - start
+timer_count=0
 
 def demand():
     params = {'id': 'test'}
@@ -62,6 +56,7 @@ def demand():
     pygame.mixer.init()
     pygame.mixer.music.load("input_test2.mp3")
     pygame.mixer.music.play()
+
 
 # GET : API를 호출할 시간과 날짜
 def get_api_date():
@@ -191,11 +186,11 @@ def tts_weather() :
     pygame.mixer.init()
     pygame.mixer.music.load("demand+weather.mp3")
     pygame.mixer.music.play()
-    
 
-
+#스위치 도어 센서 작동
 def DoorSensor():
     while True:
+        #문열림 감지시 날씨 알림과 요구사항 데이터 음성 출력
         if GPIO.input(door_pin) == True:
             tts_weather()
             time.sleep(8)
@@ -204,26 +199,28 @@ def DoorSensor():
             break
         time.sleep(5)
 
-
+#PIR 모션 센서 작동
 def MotionSensor():
     global count
-
+    global timer_count
     try:
+        # 2초 간격으로 모션센서 작동 count증가, count가 3이상일 경우 푸시 알람
         if count >= 3 :
             print ("Motion Detected!")
             response = requests.post('https://fcm.googleapis.com/fcm/send', headers=headers, data=json.dumps(data))
             print (response)
             count = 0
+            timer_count = 0
         else:
             count += 1
             print ("count = %d" % count)
+            timer_count = 0
             time.sleep(2)
+    # 모션 감지 도중 문열림 감지시 스위치 도어 센서 함수 호출
     except GPIO.add_event_detect(door_pin, GPIO.RISING):
         GPIO.add_event_callback(door, DoorSensor)
 
-
-
-
+#메인 함수
 if __name__ == '__main__':
     print("Smart Door System")
     time.sleep(.5)
@@ -231,19 +228,19 @@ if __name__ == '__main__':
 
     try:
         while True:
+            if timer_count == 15:
+                count = 0
+                timer_count=0
             if GPIO.input(door_pin):
                 count = 0
                 DoorSensor()
             if GPIO.input(pir_pin):
                 MotionSensor()
-        #GPIO.add_event_detect(pir_pin, GPIO.RISING, callback=MotionSensor)
             time.sleep(1)
-
+            timer_count += 1
+    #종료 예외처리
     except KeyboardInterrupt:
         print("Quit")
         GPIO.cleanup()
 
-#except (GPIO.input(door_pin) != True):
-#    DoorSensor()
-
-#GPIO. 함수들 찾아볼 것
+#타이머 보완 threading.Timer(second, execute_func, [second]).star()
