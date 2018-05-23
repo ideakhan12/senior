@@ -26,11 +26,13 @@ if($result->num_rows==1)
 	}
 	else
 	{
-		echo "wrong id or pw";
+		echo "<script>alert('아이디와 비밀번호를 다시 확인해주세요');history.back();</script>";
+		exit;
 	}
 }
 else
 {
-	echo "wrong id or pwd";
+	echo "<script>alert('아이디와 비밀번호를 다시 확인해주세요');history.back();</script>";
+	exit;
 }
 ?>
