@@ -184,9 +184,14 @@ def tts_weather() :
     tts = gTTS(text=msg, lang='ko')
     tts.save("demand+weather.mp3")
 
+    #msg 크기 or 문자 수에 따라 타임 슬립 다르게 주기
+    #if  len(msg) :
+    #elif len(msg) :
+    #else len(msg) : 반복문 안에 실행 play() 넣고 슬립 넣어서 돌리면 될듯
     pygame.mixer.init()
     pygame.mixer.music.load("demand+weather.mp3")
     pygame.mixer.music.play()
+
 
 #스위치 도어 센서 작동
 def DoorSensor():
