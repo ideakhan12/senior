@@ -35,29 +35,32 @@ timer_count=0
 door_count=0
 
 def demand():
-    params = {'id': 'test'}
-    res = requests.post('http://52.79.133.253/demand.php', data=params)
-    text = res.text.encode('utf8')[3:].decode('utf8')
+    try:
+        params = {'id': 'test'}
+        res = requests.post('http://52.79.133.253/demand.php', data=params)
+        text = res.text.encode('utf8')[3:].decode('utf8')
 
-    now = datetime.strptime(datetime.now().strftime("%Y-%m-%d %H:%M:%S"), '%Y-%m-%d %H:%M:%S')
+        now = datetime.strptime(datetime.now().strftime("%Y-%m-%d %H:%M:%S"), '%Y-%m-%d %H:%M:%S')
 
-    data = json.loads(text)
-    text = ""
+        data = json.loads(text)
+        text = ""
 
-    for d in data:
-        s_date = datetime.strptime(d['s_date'], '%Y-%m-%d %H:%M:%S')
-        e_date = datetime.strptime(d['e_date'], '%Y-%m-%d %H:%M:%S')
+        for d in data:
+            s_date = datetime.strptime(d['s_date'], '%Y-%m-%d %H:%M:%S')
+            e_date = datetime.strptime(d['e_date'], '%Y-%m-%d %H:%M:%S')
 
-        if (now > s_date) and (now < e_date):
-            text = text + d['text'] + " ″"
+            if (now > s_date) and (now < e_date):
+                text = text + d['text'] + " ″"
 
-    tts = gTTS(text=text, lang='ko')
-    tts.save("input_test2.mp3")
+        tts = gTTS(text=text, lang='ko')
+        
+        tts.save("input_test2.mp3")
 
-    pygame.mixer.init()
-    pygame.mixer.music.load("input_test2.mp3")
-    pygame.mixer.music.play()
-
+        pygame.mixer.init()
+        pygame.mixer.music.load("input_test2.mp3")
+        pygame.mixer.music.play()
+    except :
+        return
 
 # GET : API를 호출할 시간과 날짜
 def get_api_date():
@@ -186,16 +189,9 @@ def tts_weather() :
 
     #msg 크기 or 문자 수에 따라 타임 슬립 다르게 주기
     pygame.mixer.init()     #파이썬 한글은 3비트
-    if  len(msg) > 100 :
-        pygame.mixer.music.load("demand+weather.mp3")
-        pygame.mixer.music.play()
-        #time.sleep()
-    elif  len(msg) > 70 and len(msg) <= 100 :
-        pygame.mixer.music.load("demand+weather.mp3")
-        pygame.mixer.music.play()
-    else :
-        pygame.mixer.music.load("demand+weather.mp3")
-        pygame.mixer.music.play()
+    
+    pygame.mixer.music.load("demand+weather.mp3")
+    pygame.mixer.music.play()
 
 
 #스위치 도어 센서 작동
@@ -208,8 +204,9 @@ def DoorSensor():
             tts_weather()
             time.sleep(8)
             demand()
-        elif (GPIO.input(door_pin) == 1) and (door_count > 1):
-            continue
+            door_count = door_count + 1
+        elif door_count > 1:
+            break
         elif GPIO.input(door_pin) == 0:
             door_count = 0
             break
@@ -244,6 +241,8 @@ if __name__ == '__main__':
 
     try:
         while True:
+            if GPIO.input(door_pin) == 0:
+                door_count = 0
             if timer_count == 15:
                 count = 0
                 timer_count=0
