@@ -62,64 +62,81 @@ def get_weather_data():
     for one_parsed in parsed_json:
         # CREATE : 시간대 별 PTY를 얻고 시간과 PTY값으로 딕셔너리
         if one_parsed['category'] == "PTY":
-            if one_parsed['fcstTime'] not in time_arr :
-                pty_dic[one_parsed['fcstTime']] = one_parsed['fcstValue']
-                time_arr.append(one_parsed['fcstTime'])
+            #if one_parsed['fcstTime'] not in time_arr :
+            pty_dic[str(one_parsed['fcstDate'])+str(one_parsed['fcstTime'])] = one_parsed['fcstValue']
+            time_arr.append(str(one_parsed['fcstDate'])+str(one_parsed['fcstTime']))
         # CREATE : 시간대 별 SKY를 얻고 시간과 SKY값으로 딕셔너리
         if one_parsed['category'] == "SKY":
-            if one_parsed['fcstTime'] not in time_arr2 :
-                sky_dic[one_parsed['fcstTime']] = one_parsed['fcstValue']
-                time_arr2.append(one_parsed['fcstTime'])
+            #if one_parsed['fcstTime'] not in time_arr2 :
+            sky_dic[str(one_parsed['fcstDate'])+str(one_parsed['fcstTime'])] = one_parsed['fcstValue']
+            #time_arr2.append(one_parsed['fcstTime'])
         # GET : TMX
         if one_parsed['category'] == 'TMX' :
             TMX = one_parsed['fcstValue']
 
-    return (pty_dic, sky_dic, TMX, target_time, time_arr)
+    return (pty_dic, sky_dic, TMX, target_time, target_date, time_arr)
 
 def tts_weather() :
-    pty_dic, sky_dic, TMX, target_time, all_time = get_weather_data()
-    change_time = [target_time] # 기상상태 바뀌는 시간을 저장할 배열
+    pty_dic, sky_dic, TMX, target_time, target_date, all_time = get_weather_data()
     TMX = int(TMX)
+    new_pty_dic, new_sky_dic, all_key = {}, {}, []
+
+    for key, value in sky_dic.items() :
+        if key[0:8] == str(target_date) :
+            keys = "금일 " + str(key[8:10])
+            new_sky_dic[keys] = value
+        else :
+            keys = "익일 " + str(key[8:10])
+            new_sky_dic[keys] = value
+        all_key.append(keys)
+
+    for key, value in pty_dic.items() :
+        if key[0:8] == str(target_date) :
+            new_pty_dic["금일 "+str(key[8:10])] = value
+        else :
+            new_pty_dic["익일 "+str(key[8:10])] = value
 
     # 코드명으로 된 Value값 한글로 변환
-    for all in all_time :
-        if sky_dic[all] == 1 :
-            sky_dic[all] = "맑음"
-        elif sky_dic[all] == 2 :
-            sky_dic[all] = "구름조금"
-        elif sky_dic[all] == 3 :
-            sky_dic[all] = "구름많음"
+    for all in all_key :
+        if new_sky_dic[all] == 1 :
+            new_sky_dic[all] = "맑음"
+        elif new_sky_dic[all] == 2 :
+            new_sky_dic[all] = "구름조금"
+        elif new_sky_dic[all] == 3 :
+            new_sky_dic[all] = "구름많음"
         else :
-            sky_dic[all] = "흐림"
+            new_sky_dic[all] = "흐림"
 
-    for all in all_time :
-        if pty_dic[all] == 1 :
-            pty_dic[all] = "비"
-        elif pty_dic[all] == 2 :
-            pty_dic[all] = "진눈깨비"
-        elif pty_dic[all] == 3 :
-            pty_dic[all] = "눈"
+    for all in all_key :
+        if new_pty_dic[all] == 1 :
+            new_pty_dic[all] = "비가"
+        elif new_pty_dic[all] == 2 :
+            new_pty_dic[all] = "진눈깨비가"
+        elif new_pty_dic[all] == 3 :
+            new_pty_dic[all] = "눈이"
+
+    change_time = [all_key[0]]  # 기상상태 바뀌는 시간을 저장할 배열
 
     # GET : 기상상태가 바뀌는 시간
-    for i in range(len(all_time)) :
-        if i != 7 :
-            if pty_dic[all_time[i]] != pty_dic[all_time[i+1]] :
+    for i in range(len(all_key)) :
+        if i != 9 :
+            if new_pty_dic[all_key[i]] != new_pty_dic[all_key[i+1]] :
                 change_time.append(all_time[i+1])
 
     # CREATE : 출력할 msg
     flag = 1
     for time in change_time :
         if flag == 1 :
-            if pty_dic[time] != 0:
-                msg = "현재 "+str(pty_dic[time])+"가 내리고 있습니다"
+            if new_pty_dic[time] != 0:
+                msg = "현재 "+str(new_pty_dic[time])+" 내리고 있습니다"
             else :
-                msg = "현재 " +str(sky_dic[time])+ " 입니다"
+                msg = "현재 " +str(new_sky_dic[time])+ " 입니다"
             flag += 1
         else :
-            if pty_dic[time] != 0:
-                msg += " 이후 "+str(time[0:2])+"시에 "+str(pty_dic[time])+"가 내릴 예정입니다"
+            if new_pty_dic[time] != 0:
+                msg += " 이후 "+str(time)+"시에 "+str(new_pty_dic[time])+" 예상됩니다"
             else :
-                msg += " 이후 "+str(time[0:2])+"시에 그칠 예정이며 "+str(sky_dic[time]) + " 예정입니다"
+                msg += " 이후 "+str(time)+"시에 그칠 예정이며 "+str(sky_dic[time]) + " 예상됩니다"
 
     if TMX > 33 :
         msg+=" 금일 낮 최고 온도는 "+str(TMX)+"도로 예상되며 폭염에 주의하세요"
