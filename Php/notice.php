@@ -75,16 +75,15 @@
 <body>
    <div data-role="page">
       <div data-role="navbar" align="center" style="background-color: #ffffff">
-         <ul style="margin-top:0.7em">
+         <ul style="margin-top:0.94em">
             <li></li>
             <li style="margin-top:0.2em"><font size="4.5em" face="sans-serif" style="cursor:pointer"
                onclick="window.location.href='./index.php'">누구세홈</font></li>
             <li><img src="img/cancel.png" width="23em" style="margin-left:4.4em; margin-top:-0.6em; margin-bottom:-0.4em; cursor:pointer" onclick="logout()" ></li>
          </ul>
-         <hr/>
-
       </div>
       <div data-role="content" align="center">
+        <div style="width:100%; background-color:#b9b9b9; height:1px; margin-top:0.75em" ></div>
          <div style="width:98%; background-image:url(img/notice_imgbar.jpg); 
         background-size:100%; height:27%; text-align:left; margin-top:0.2em; font-family:sans-serif;">
         <p style="font-size:1.5em; margin-left:1.5em; margin-top:0.1em; padding-top:2.9em; color:white">

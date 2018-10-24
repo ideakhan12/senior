@@ -78,7 +78,7 @@
 				<p style="font-size:0.7em; margin-left:3.3em; color:white; margin-top:-1.8em">
 				운송장번호를 등록하여 택배 알림 서비스를 받아보세요</p>
 			</div>
-			<form id="modify" name="modifyform" action="/delivery_m.php" method="post" data-ajax="false">
+			<form id="deliveryeform" name="deliveryeform" method="post" data-ajax="false">
 			<input type="hidden" value="0" id="no" name="no">
 				<?php
 					include('config.php');
@@ -88,7 +88,7 @@
 					while( $data = mysqli_fetch_array($result))
 					{ 
 						$no = $data['no'];
-						$$s_date = date("Y/m/d", strtotime($data['s_date']));
+						$s_date = date("Y/m/d", strtotime($data['s_date']));
 						$e_date = date("Y/m/d", strtotime($data['e_date']));
 						$s_time = date("H시 i분", strtotime($data['s_time']));
 						$e_time = date("H시 i분", strtotime($data['e_time']));
@@ -98,9 +98,10 @@
 						$text = $data['text'];
 
 						echo "<div class='memo'>";
-						echo "<font size='2em' face='sans-serif' color='gray' style='font-weight:bold' id='wdate'>",$w_date, "</font><br/>";
-						echo "<br/><a href='#' id='$no' onclick='modifyDelivery(this)'><font size='3em'>", $text, "</font>";
-						echo "<br/><font size='1.5em' id='date'>", $s_date, " ~ ", $e_date, "</font></a><br/><br/>";
+						echo "<font size='2em' face='sans-serif' color='gray' style='font-weight:bold; margin-left:0em' id='wdate'>",$w_date, "</font>　　<a href='#' id='$no' onclick='deleteDeivery(this)'>
+						<img src='img/cancel.png' width='20em' style='margin-left:10em;'></a><br/>";
+						echo "<br/><div id='text'><a href='#' id='$no' onclick='modifyDelivery(this)'><font size='3em' id='text'>", $text, "</font>";
+						echo "<br/><font size='1.5em' id='date'>", $s_date, " ", $s_time, " ~ ", $e_date, " ", $e_time, "</font></a></div><br/><br/>";
 						echo "</div>";
 					}
 				?>
@@ -111,8 +112,19 @@
 		function modifyDelivery(obj)
 		{
 			var click_id = obj.id;
-			document.modifyform.no.value = click_id;
-			document.getElementById('modify').submit()
+			document.deliveryeform.no.value = click_id;
+			document.deliveryeform.action = '/delivery_m.php';
+			document.getElementById('deliveryeform').submit()
+		}
+		function deleteDeivery(obj)
+		{
+			if(confirm("해당 일정을 삭제하시겠습니까?"))
+			{
+				var click_id = obj.id;
+				document.deliveryeform.no.value = click_id;
+				document.deliveryeform.action = '/delivery_del.php';
+				document.getElementById('deliveryeform').submit()
+			}
 		}
 	</script>
 </body>

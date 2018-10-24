@@ -7,6 +7,7 @@
 	$phone = $_POST['phone'];
 	$adr = $_POST['adr'];
 
+	
 	$sql = "SELECT * FROM members WHERE id='$id'";
 	$confirm = $con->query($sql);
 
@@ -32,4 +33,5 @@
 			exit;
 		}
 	}
+	
 ?>

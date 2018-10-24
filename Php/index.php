@@ -42,13 +42,6 @@
 		text-align: center;
 	}
 
-	hr
-	{
-		background-color: #eeeeee; 
-		height: 1px; 
-		border: 0;
-	}
-
 	#title
 	{
 		margin-left:1em;
@@ -110,16 +103,17 @@
 <body>
 	<div data-role="page">
 		<div data-role="navbar" align="center" style="background-color: #ffffff">
-			<ul style="margin-top:0.7em">
+			<ul style="margin-top:0.6em">
 				<li></li>
-				<li style="margin-top:0.2em"><font size="4.5em" face="sans-serif">누구세홈</font></li>
-				<li><a><img src="img/cancel.png" width="23em" style="margin-left:4.4em; margin-top:-0.6em; margin-bottom:-0.4em" onclick="logout()"></a></li>
-				<!--
-				<li><a href="#" data-ajax="false" style="margin-left:4.4em; margin-bottom:-0.6em; margin-top:-0.6em"><img src="img/cancel.png" width="23em"></a></li>-->
+				<li style="margin-top:0.45em">
+					<font size="4.5em" face="sans-serif" style="cursor:pointer"
+					onclick="window.location.href='./index.php'">누구세홈</font>
+				</li>
+				<li><a><img src="img/cancel.png" width="23em" style="margin-left:4.4em; margin-top:-0.3em; margin-bottom:0.4em" onclick="logout()"></a></li>
 			</ul>
-			<hr/>
 		</div>
 		<div data-role="content" align="center">
+			<div style="width:100%; background-color:#b9b9b9; height:1px"></div>
 			<table width="100%" height="100%" style="background-color: white">
 				<tr>
 					<td valign="top" style="padding-top:0px" align="center">
@@ -128,101 +122,53 @@
 							<input type="text" style="width:100px">
 						</div>
 						<div id="menu">
-							<a href="#" data-ajax="false">
+							<a href="./monitoring.php" data-ajax="false">
 							<img src="img/monitor.png" width="30em" id="menu_img"><br/>
 							<font size="2em">모니터링</font>
 							</a>
 						</div>
 						<div id="menu">
-							<a href="./list.php" data-ajax="false">
+							<a href="./schedule.php" data-ajax="false">
 							<img src="img/memo.png" width="30em" id="menu_img"><br/>
-							<font size="2em">일정/택배</font>
+							<font size="2em">일정</font>
 							</a>
 						</div>
 						<div id="menu">
-							<a href="#" data-ajax="false">
-							<img src="img/images.png" width="30em" id="menu_img"><br/>
-							<font size="2em">히스토리</font>
+							<a href="./delivery.php" data-ajax="false">
+							<img src="img/box.png" width="30em" id="menu_img"><br/>
+							<font size="2em">택배</font>
 							</a>
 						</div>
 						<div id="menu">
-							<a href="#" data-ajax="false">
+							<a href="./setting.php" data-ajax="false">
 							<img src="img/setting.png" width="30em" id="menu_img"><br/>
 							<font size="2em">환경설정</font>
 							</a>
 						</div>
-
-						<div style="border:1px solid #eee; width:90%; text-align:left; margin-top:0.5em;">
+						<div style="border:1px solid #eee; width:90%; text-align:left; 
+						margin-top:0.5em; padding-bottom:0.2em; margin-bottom:0.5em">
 							<center>
 							<img src="img/list2.jpg" id="title_img"></center>
 							<!-- 타이틀 -->
-							<div style="margin-top:0.2em;border-bottom: 1px solid #eee">
-								<!--
-								<font size="3em" id="title">공지사항</font>
-								<img src="img/notice.png" width="20em">
-							-->
-							</div>
-						<?php
-							include('config.php');
-							$sql = "SELECT * FROM notice order by w_date";
-							$result = mysqli_query($con, $sql);
-
-							while( $data = mysqli_fetch_array($result))
-							{ 
-								$no = $data['no'];
-								$title = $data['title'];
-								$contents = $data['contents'];
-								$w_date = date("Y-m-d", strtotime($data['w_date']));
-
-								echo "<div style='margin-bottom:0.8em'>";
-								echo "<a style='margin-top:2em;'><font size='1.5em' color='gray' style='margin-left:4em'>", $w_date, " </font>";
-								echo "<font size='2.5em' style='margin-left:3em'>#", $title, "</font><br/></a>";
-								echo "</div>";
-								
-							}
-						?>
-					</div>
+						</div>
+						<div style="width:30%; border:1px solid #eee; display:inline-block; padding-bottom:0.7em;">
+							<a href="./notice.php" data-ajax="false">
+							<img src="img/icon_notice.png" width="30em" id="menu_img"><br/>
+							<font size="2em">공지사항</font>
+							</a>
+						</div>
+						<div style="width:58%; border:1px solid #eee;  display:inline-block; padding-bottom:0.7em">
+							<a href="#">
+							<img src="img/call.png" width="30em" id="menu_img"><br/>
+							<font size="2em"><b>CALL CENTER</b></font>
+							</a>
+						</div>
 						<center>
+							<br/>
+						<h5>COPYRIGHT 2018 @ BELL</h5>
 						<br/>
-						<br/>
-						<!--
-						<table width="90%">
-	        					<tr>
-	        						<td align="center" valign="center" width="47%" id="menu">
-	        							<a href="http://localhost/m_monitoring.php">
-	        							<img src="img/video-camera.png" width="50em" style="padding:0px; margin:5px;"></a>
-	        							<br/>
-	        							<font id="mfont"><b>실시간 모니터링</b></font>
-	        						</td>
-	        						<td width="6%"></td>
-	        						<td align="center" valign="center" width="47%" id="menu">
-	        							<a href="./list.php" data-ajax="false">
-	        							<img src="img/notepad.png" width="50em" style="padding:0px; margin:5px;"></a>
-	        							<br/>
-	        							<font id="mfont"><b>일정 / 택배</b></font>
-	        						</td>
-	        					</tr>
-	        					<tr>
-	        						<td colspan="3" height="18px"></td>
-	        					</tr>
-	        					<tr>
-	        						<td align="center" valign="center" width="47%" id="menu">
-	        							<a href="http://localhost/m_monitoring.php">
-	        							<img src="img/screen.png" width="50em" style="padding:0px; margin:5px;"></a>
-	        							<br/>
-	        							<font id="mfont"><b>히스토리</b></font>
-	        						</td>
-	        						<td width="6%"></td>
-	        						<td align="center" valign="center" width="47%" id="menu">
-	        							<a href="http://localhost/m_monitoring.php">
-	        							<img src="img/settings.png" width="50em" style="padding:0px; margin:5px;"></a>
-	        							<br/>
-	        							<font id="mfont"><b>환경설정</b></font>
-	        						</td>
-	        					</tr>
-	        				</table>
-	        			-->
 	        			</center>
+
 					</td>
 				</tr>
 			</table>

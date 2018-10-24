@@ -83,7 +83,7 @@
 				<p style="font-size:0.7em; margin-left:3.3em; color:white; margin-top:-1.8em">
 				중요 사항을 기록하여 스마트한 알림을 받아보세요</p>
 			</div>
-				<form id="modify" name="modifyform" action="/schedule_m.php" method="post" data-ajax="false">
+				<form id="scheduleform" name="scheduleform" method="post" data-ajax="false">
 					<input type="hidden" value="0" id="no" name="no">
 				<?php
 					include('config.php');
@@ -101,7 +101,8 @@
 						$w_date = date("M d, Y", strtotime($data['w_date']));
 
 						echo "<div class='memo'>";
-						echo "<font size='2em' face='sans-serif' color='gray' style='font-weight:bold' id='wdate'>",$w_date, "</font><br/>";
+						echo "<font size='2em' face='sans-serif' color='gray' style='font-weight:bold; margin-left:0em' id='wdate'>",$w_date, "</font>　　<a href='#' id='$no' onclick='deleteSchedule(this)'>
+						<img src='img/cancel.png' width='20em' style='margin-left:10em;'></a><br/>";
 						echo "<br/><div id='text'><a href='#' id='$no' onclick='modifySchedule(this)'><font size='3em' id='text'>", $text, "</font>";
 						echo "<br/><font size='1.5em' id='date'>", $s_date, " ", $s_time, " ~ ", $e_date, " ", $e_time, "</font></a></div><br/><br/>";
 						echo "</div>";
@@ -112,8 +113,19 @@
 				function modifySchedule(obj)
 				{
 					var click_id = obj.id;
-					document.modifyform.no.value = click_id;
-					document.getElementById('modify').submit()
+					document.scheduleform.no.value = click_id;
+					document.scheduleform.action = '/schedule_m.php'
+					document.getElementById('scheduleform').submit()
+				}
+				function deleteSchedule(obj)
+				{
+					if(confirm("해당 일정을 삭제하시겠습니까?"))
+					{
+						var click_id = obj.id;
+						document.scheduleform.no.value = click_id;
+						document.scheduleform.action = '/schedule_del.php'
+						document.getElementById('scheduleform').submit()
+					}
 				}
 			</script>
 		</div>
